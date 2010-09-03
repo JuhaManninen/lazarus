@@ -46,7 +46,7 @@ interface
 uses
   Classes, SysUtils, LCLProc, LConvEncoding, Forms, Controls, LCLType, LCLIntf,
   Graphics, GraphType, StdCtrls, ExtCtrls, Buttons, FileUtil, Dialogs, Types,
-  Laz_XMLCfg, InterfaceBase, Themes, ComCtrls, // LResources,
+  Laz_XMLCfg, InterfaceBase, Themes, ComCtrls,
   LazarusIDEStrConsts, TransferMacros, LazConf, IDEProcs, DialogProcs,
   IDEMsgIntf, IDEContextHelpEdit, IDEImagesIntf,
   InputHistory, ExtToolDialog, ExtToolEditDlg, EnvironmentOpts,
@@ -96,6 +96,7 @@ type
     TargetDirectoryComboBox: TComboBox;
     TargetDirectoryLabel: TLabel;
     TargetOSLabel: TLabel;
+    UpdateRevisionIncCheckBox: TCheckBox;
     WithStaticPackagesCheckBox: TCheckBox;
     procedure BuildProfileButtonClick(Sender: TObject);
     procedure BuildProfileComboBoxSelect(Sender: TObject);
@@ -138,15 +139,19 @@ function BuildLazarus(Profiles: TBuildLazarusProfiles;
   ExternalTools: TExternalToolList; Macros: TTransferMacroList;
   const PackageOptions, CompilerPath, MakePath: string;
   Flags: TBuildLazarusFlags): TModalResult;
+
 function CreateBuildLazarusOptions(Profiles: TBuildLazarusProfiles;
   ItemIndex: integer; Macros: TTransferMacroList;
   const PackageOptions: string; Flags: TBuildLazarusFlags;
   var ExtraOptions: string; out UpdateRevisionInc: boolean;
   out OutputDirRedirected: boolean): TModalResult;
+
 function SaveIDEMakeOptions(Profiles: TBuildLazarusProfiles;
   Macros: TTransferMacroList;
   const PackageOptions: string; Flags: TBuildLazarusFlags): TModalResult;
+
 function GetMakeIDEConfigFilename: string;
+
 function GetTranslatedMakeModes(MakeMode: TMakeMode): string;
 
 
@@ -174,7 +179,6 @@ function ShowConfigureBuildLazarusDlg(AProfiles: TBuildLazarusProfiles): TModalR
 // mrYes=save and compile
 var
   ConfigBuildLazDlg: TConfigureBuildLazarusDlg;
-//  OldExtraOptions: String;
 begin
   Result := mrCancel;
   ConfigBuildLazDlg := TConfigureBuildLazarusDlg.Create(nil);
@@ -299,8 +303,7 @@ begin
       // append extra options
       ExtraOptions:='';
       Result:=CreateBuildLazarusOptions(Profiles,i,Macros,PackageOptions,Flags,
-                                        ExtraOptions,UpdateRevisionInc, // DisableSvn2RevisionInc,
-                                        OutputDirRedirected);
+                                 ExtraOptions,UpdateRevisionInc,OutputDirRedirected);
       if Result<>mrOk then exit;
 
       if (not OutputDirRedirected)
@@ -395,9 +398,9 @@ var
   BundleDir: String;
 begin
   Result:=mrOk;
-  UpdateRevisionInc:=false; //Options.UpdateRevisionInc;
-  OutputDirRedirected:=false;
   Options:=Profiles.Current;
+  OutputDirRedirected:=false;
+  UpdateRevisionInc:=Options.UpdateRevisionInc;
   MMDef:=Profiles.MakeModeDefs[ItemIndex];
 
   // create extra options
@@ -754,6 +757,7 @@ begin
   CleanAllCheckBox.Caption := lisLazBuildCleanAll;
   OptionsLabel.Caption := lisLazBuildOptions;
   WithStaticPackagesCheckBox.Caption := lisLazBuildWithStaticPackages;
+  UpdateRevisionIncCheckBox.Caption := lisUpdateRevisionInc;
   RestartAfterBuildCheckBox.Caption := lisLazBuildRestartAfterBuild;
   ConfirmBuildCheckBox.Caption := lisLazBuildConfirmBuild;
   CompileButton.Caption := lisMenuBuild;
@@ -988,6 +992,7 @@ begin
   OptionsEdit.Text                  :=AProfile.ExtraOptions;
   LCLInterfaceRadioGroup.ItemIndex  :=ord(AProfile.TargetPlatform)+1;
   WithStaticPackagesCheckBox.Checked:=AProfile.WithStaticPackages;
+  UpdateRevisionIncCheckBox.Checked :=AProfile.UpdateRevisionInc;
   RestartAfterBuildCheckBox.Checked :=AProfile.RestartAfterBuild;
   ConfirmBuildCheckBox.Checked      :=AProfile.ConfirmBuild;
   TargetOSComboBox.Text             :=AProfile.TargetOS;
@@ -1004,6 +1009,7 @@ begin
   else
     AProfile.TargetPlatform  :=TLCLPlatform(LCLInterfaceRadioGroup.ItemIndex-1);
   AProfile.WithStaticPackages:=WithStaticPackagesCheckBox.Checked;
+  AProfile.UpdateRevisionInc :=UpdateRevisionIncCheckBox.Checked;
   AProfile.RestartAfterBuild :=RestartAfterBuildCheckBox.Checked;
   AProfile.ConfirmBuild      :=ConfirmBuildCheckBox.Checked;
   AProfile.TargetOS          :=TargetOSComboBox.Text;
@@ -1025,7 +1031,6 @@ begin
   CopyProfileToUI(fProfiles.Current); // Copy current selection to UI.
   BuildProfileComboBox.Items.EndUpdate;
   fUpdatingProfileCombo:=False;
-//  BuildProfileComboBox.Invalidate;
   MakeModeListBox.Invalidate;
 end;
 

@@ -19,9 +19,9 @@ type
     ProfileHeaderLabel: TLabel;
     OKButton: TBitBtn;
   private
-    { private declarations }
+
   public
-    { public declarations }
+
   end; 
 
 var

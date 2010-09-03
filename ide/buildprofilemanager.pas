@@ -117,6 +117,7 @@ type
     fTargetCPU: string;
     fTargetPlatform: TLCLPlatform;
     fWithStaticPackages: boolean;
+    fUpdateRevisionInc: boolean;
     fRestartAfterBuild: boolean;
     fConfirmBuild: boolean;
     // MakeModeSettings is Synchronised with TMakeModeDefs, same indexes.
@@ -142,6 +143,7 @@ type
     property TargetCPU: string read fTargetCPU write SetTargetCPU;
     property TargetPlatform: TLCLPlatform read GetTargetPlatform write SetTargetPlatform;
     property WithStaticPackages: boolean read fWithStaticPackages write fWithStaticPackages;
+    property UpdateRevisionInc: boolean read fUpdateRevisionInc write fUpdateRevisionInc;
     property RestartAfterBuild: boolean read fRestartAfterBuild write fRestartAfterBuild;
     property ConfirmBuild: boolean read fConfirmBuild write fConfirmBuild;
     property MakeModes: TMakeModeSettings read fMakeModes;
@@ -451,6 +453,7 @@ begin
   FRestartAfterBuild :=XMLConfig.GetValue(Path+'RestartAfterBuild/Value',true);
   FConfirmBuild      :=XMLConfig.GetValue(Path+'ConfirmBuild/Value',true);
   FWithStaticPackages:=XMLConfig.GetValue(Path+'WithStaticPackages/Value',true);
+  FUpdateRevisionInc :=XMLConfig.GetValue(Path+'UpdateRevisionInc/Value',true);
 end;
 
 procedure TBuildLazarusProfile.Save(XMLConfig: TXMLConfig; const Path: string);
@@ -475,6 +478,7 @@ begin
   XMLConfig.SetDeleteValue(Path+'RestartAfterBuild/Value',FRestartAfterBuild,true);
   XMLConfig.SetDeleteValue(Path+'ConfirmBuild/Value',FConfirmBuild,true);
   XMLConfig.SetDeleteValue(Path+'WithStaticPackages/Value',FWithStaticPackages,true);
+  XMLConfig.SetDeleteValue(Path+'UpdateRevisionInc/Value',FUpdateRevisionInc,true);
 end;
 
 procedure TBuildLazarusProfile.Assign(Source: TBuildLazarusProfile; ACopyName: Boolean);
