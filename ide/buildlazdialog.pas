@@ -1087,6 +1087,7 @@ var
 begin
   Frm:=TBuildProfileManagerForm.Create(nil);
   try
+    CopyUIToProfile(Profiles.Current);     // Make sure changed fields get included.
     Frm.Prepare(fProfiles);                // Copy profiles to dialog.
     if Frm.ShowModal = mrOk then begin
       fProfiles.Assign(Frm.ProfsToManage); // Copy profiles back from dialog.
